@@ -19,6 +19,7 @@ Shader "Unlit/WaveShader"
 			#include "UnityCG.cginc"
 
 			uniform sampler2D _MainTex;	
+			uniform float4x4 _CustomMVP;
 
 			struct vertIn
 			{
@@ -36,12 +37,17 @@ Shader "Unlit/WaveShader"
 			vertOut vert(vertIn v)
 			{
 				// Displace the original vertex in model space
-				float4 displacement = float4(0.0f, 0.0f, 0.0f, 0.0f);
+				float4 displacement = float4(0.0f, sin(v.vertex.x+_Time.y), 0.0f, 0.0f);
 				v.vertex += displacement;
 
 				vertOut o;
-				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+				// Task 7 o.vertex = mul(mul(UNITY_MATRIX_P,unity_ObjectToWorld), v.vertex);
+				
+				v.vertex = mul(UNITY_MATRIX_MV,v.vertex);
+				v.vertex += float4(0.0f, sin(v.vertex.x), 0.0f, 0.0f);
+				o.vertex = mul(UNITY_MATRIX_P,v.vertex);
 				o.uv = v.uv;
+				
 				return o;
 			}
 			
